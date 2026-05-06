@@ -1,89 +1,48 @@
-import json
-from pathlib import Path
+# Cloud.AI Board Reporting Agent
 
-import pandas as pd
-import streamlit as st
+AI-assisted SaaS FP&A board reporting workflow.
 
-from extract_metrics import extract_metrics
-from generate_summary import generate_markdown_report
-from export_charts import export_charts
+This project converts a SaaS financial model into board-ready reporting outputs.
 
+## Workflow
 
-st.set_page_config(
-    page_title="Cloud.AI Board Reporting Agent",
-    layout="wide"
-)
+1. Upload SaaS financial model
+2. Extract KPI metrics
+3. Generate board commentary
+4. Export charts
+5. Produce board-report summary
+6. Use outputs for stakeholder presentation
 
-st.title("Cloud.AI Board Reporting Agent")
-st.caption("AI-assisted SaaS FP&A workflow: Excel model → KPI extraction → board report → charts → presentation inputs")
+## Outputs
 
-uploaded_file = st.file_uploader(
-    "Upload SaaS financial model workbook",
-    type=["xlsx", "xlsm"]
-)
+- KPI summary
+- Runway analysis
+- Profitability analysis
+- Scenario comparison
+- Risk summary
+- Board recommendations
+- Chart images
+- Markdown board report
 
-if uploaded_file:
-    work_dir = Path("streamlit_outputs")
-    input_dir = work_dir / "input"
-    output_dir = work_dir / "output"
-    charts_dir = work_dir / "charts"
-    reports_dir = work_dir / "reports"
+## Tech Stack
 
-    input_dir.mkdir(parents=True, exist_ok=True)
-    output_dir.mkdir(parents=True, exist_ok=True)
-    charts_dir.mkdir(parents=True, exist_ok=True)
-    reports_dir.mkdir(parents=True, exist_ok=True)
+- Excel
+- Python
+- Pandas
+- OpenPyXL
+- Matplotlib
+- Streamlit
+- GPT / Codex
+- Gamma
 
-    workbook_path = input_dir / uploaded_file.name
-    workbook_path.write_bytes(uploaded_file.getbuffer())
+## Files
 
-    with st.spinner("Reading workbook and generating board reporting outputs..."):
-        metrics = extract_metrics(workbook_path)
+- `app.py` - Streamlit frontend
+- `extract_metrics.py` - extracts model metrics
+- `generate_summary.py` - creates board report
+- `export_charts.py` - exports charts
+- `main.py` - local pipeline runner
 
-        metrics_path = output_dir / "cloud_ai_metrics.json"
-        metrics_path.write_text(json.dumps(metrics, indent=2), encoding="utf-8")
+## Demo Purpose
 
-        report = generate_markdown_report(metrics)
-        report_path = reports_dir / "cloud_ai_board_report.md"
-        report_path.write_text(report, encoding="utf-8")
-
-        chart_paths = export_charts(metrics, charts_dir)
-
-    summary = metrics.get("summary_metrics", {})
-
-    st.success("Board reporting workflow completed successfully.")
-
-    st.subheader("Executive KPI Snapshot")
-
-    col1, col2, col3, col4 = st.columns(4)
-
-    col1.metric("Ending ARR", f"${summary.get('ending_arr', 0):,.0f}")
-    col2.metric("Ending MRR", f"${summary.get('ending_mrr', 0):,.0f}")
-    col3.metric("Ending Customers", f"{summary.get('ending_customers', 0):,.1f}")
-    col4.metric("Funding Need", f"${summary.get('funding_need', 0):,.0f}")
-
-    st.subheader("Generated Charts")
-
-    for chart in chart_paths:
-        st.image(str(chart), caption=chart.name, use_container_width=True)
-
-    st.subheader("Board Report")
-
-    st.markdown(report)
-
-    st.download_button(
-        "Download Metrics JSON",
-        data=metrics_path.read_text(encoding="utf-8"),
-        file_name="cloud_ai_metrics.json",
-        mime="application/json"
-    )
-
-    st.download_button(
-        "Download Board Report",
-        data=report,
-        file_name="cloud_ai_board_report.md",
-        mime="text/markdown"
-    )
-
-else:
-    st.info("Upload the SaaS financial model workbook to generate the board reporting output.")
+This is a sample FP&A automation project using dummy SaaS financial model data.
